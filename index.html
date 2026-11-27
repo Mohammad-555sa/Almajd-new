@@ -1,0 +1,224 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>المجد الجديد | نظام خروج الطلاب</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <div class="logo">م</div>
+    <h1>مدرسة المجد الجديد</h1>
+    <p>نظام إدارة ومراقبة خروج الطلاب</p>
+    <label>نوع الحساب</label>
+    <select id="loginRole">
+      <option value="admin">الإدارة العليا</option>
+      <option value="teacher">المعلم</option>
+      <option value="parent">ولي الأمر</option>
+      <option value="duty">المراقبة</option>
+      <option value="board">الصبورة الذكية</option>
+    </select>
+    <label>اسم المستخدم</label>
+    <input id="loginName" placeholder="اكتب اسم المستخدم">
+    <label>كلمة المرور</label>
+    <input id="loginPassword" type="password" placeholder="1234">
+    <button class="primary full" onclick="login()">تسجيل الدخول</button>
+    <small>للعرض التجريبي: كلمة المرور 1234</small>
+  </div>
+</div>
+
+<div id="app" class="hidden">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">م</div>
+      <div><b>المجد الجديد</b><small>إدارة خروج الطلاب</small></div>
+    </div>
+
+    <div class="user-info">
+      <div class="avatar" id="userAvatar">م</div>
+      <div><b id="userName">المستخدم</b><small id="userRole">الإدارة</small></div>
+    </div>
+
+    <div class="menu-title">القائمة الرئيسية</div>
+    <nav id="navigation">
+      <button class="menu active" data-page="dashboard" onclick="navigate('dashboard',this)">🏠 الرئيسية</button>
+      <button class="menu" data-page="admin" data-role="admin" onclick="navigate('admin',this)">⚙️ إدارة المدرسة</button>
+      <button class="menu" data-page="parents" data-role="admin" onclick="navigate('parents',this)">👨‍👩‍👧 أولياء الأمور</button>
+      <button class="menu" data-page="schedule" data-role="admin" onclick="navigate('schedule',this)">📅 جدول المعلمين</button>
+      <button class="menu" data-page="monitor" data-role="admin,duty" onclick="navigate('monitor',this)">🖥️ المراقبة</button>
+      <button class="menu" data-page="teacher" data-role="teacher" onclick="navigate('teacher',this)">🎓 لوحة المعلم</button>
+      <button class="menu" data-page="parent" data-role="parent" onclick="navigate('parent',this)">👨‍👦 طلب خروج</button>
+      <button class="menu" data-page="board" data-role="board" onclick="navigate('board',this)">📋 الصبورة الذكية</button>
+    </nav>
+
+    <button class="logout" onclick="logout()">↪ تسجيل الخروج</button>
+  </aside>
+
+  <main class="main">
+    <header>
+      <div>
+        <h1 id="pageTitle">الرئيسية</h1>
+        <p id="today"></p>
+      </div>
+      <div class="live-indicator"><span></span> النظام يعمل</div>
+    </header>
+
+    <!-- Dashboard -->
+    <section id="dashboard" class="page">
+      <div class="hero">
+        <div>
+          <h2>مرحباً بك في نظام المجد الجديد</h2>
+          <p>منصة ذكية لإدارة ومتابعة خروج الطلاب بأمان وتنظيم.</p>
+        </div>
+        <div class="hero-icon">🏫</div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><span>👨‍🎓</span><small>الطلاب</small><strong id="statStudents">0</strong></div>
+        <div class="stat"><span>🏫</span><small>الفصول</small><strong id="statClasses">0</strong></div>
+        <div class="stat"><span>🔔</span><small>الطلبات النشطة</small><strong id="statActive">0</strong></div>
+        <div class="stat"><span>⚠️</span><small>المتأخرون</small><strong id="statLate">0</strong></div>
+      </div>
+
+      <div class="panel">
+        <h3>آخر عمليات الخروج</h3>
+        <div id="recentRequests"></div>
+      </div>
+    </section>
+
+    <!-- Admin -->
+    <section id="admin" class="page hidden">
+      <div class="panel">
+        <h2>إدارة الفصول</h2>
+        <div class="form-row">
+          <input id="newClassName" placeholder="اسم الفصل الجديد">
+          <button class="primary" onclick="addClass()">+ إضافة فصل</button>
+        </div>
+        <div id="classesList"></div>
+      </div>
+
+      <div class="panel">
+        <h2>إدارة الطلاب</h2>
+        <div class="form-grid">
+          <input id="studentName" placeholder="اسم الطالب">
+          <select id="studentClass"></select>
+          <select id="studentParent"></select>
+          <button class="primary" onclick="addStudent()">+ إضافة الطالب</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>الطالب</th><th>الفصل</th><th>ولي الأمر</th><th>إجراءات</th></tr></thead>
+            <tbody id="studentsList"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>إدارة المعلمين</h2>
+        <div class="form-grid">
+          <input id="teacherName" placeholder="اسم المعلم">
+          <select id="teacherClass"></select>
+          <button class="primary" onclick="addTeacher()">+ إضافة معلم</button>
+        </div>
+        <div id="teachersList"></div>
+      </div>
+    </section>
+
+    <!-- Parents -->
+    <section id="parents" class="page hidden">
+      <div class="panel">
+        <h2>إضافة ولي أمر وربط الأبناء</h2>
+        <div class="form-grid">
+          <input id="parentName" placeholder="اسم ولي الأمر">
+          <input id="parentPhone" placeholder="رقم الجوال" type="tel">
+          <button class="primary" onclick="addParent()">+ إضافة ولي أمر</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>سجل أولياء الأمور</h2>
+        <div id="parentsList"></div>
+      </div>
+    </section>
+
+    <!-- Schedule -->
+    <section id="schedule" class="page hidden">
+      <div class="panel">
+        <h2>جدول المعلمين</h2>
+        <div class="form-grid">
+          <select id="scheduleTeacher"></select>
+          <select id="scheduleDay">
+            <option>الأحد</option><option>الإثنين</option><option>الثلاثاء</option><option>الأربعاء</option><option>الخميس</option>
+          </select>
+          <select id="scheduleClass"></select>
+          <select id="schedulePeriod">
+            <option>الحصة الأولى</option><option>الحصة الثانية</option><option>الحصة الثالثة</option><option>الحصة الرابعة</option><option>الحصة الخامسة</option><option>الحصة السادسة</option><option>الحصة الأخيرة</option>
+          </select>
+          <button class="primary" onclick="addSchedule()">حفظ الجدول</button>
+        </div>
+        <div id="scheduleList"></div>
+      </div>
+    </section>
+
+    <!-- Monitor -->
+    <section id="monitor" class="page hidden">
+      <div class="stats">
+        <div class="stat"><span>🔔</span><small>طلبات نشطة</small><strong id="monitorActive">0</strong></div>
+        <div class="stat"><span>⏳</span><small>بانتظار الطالب</small><strong id="monitorWaiting">0</strong></div>
+        <div class="stat"><span>⚠️</span><small>حالات متأخرة</small><strong id="monitorLate">0</strong></div>
+        <div class="stat"><span>✅</span><small>تم التسليم</small><strong id="monitorDone">0</strong></div>
+      </div>
+      <div class="panel">
+        <h2>قائمة مراقبة خروج الطلاب</h2>
+        <input id="monitorSearch" placeholder="ابحث باسم الطالب..." oninput="renderAll()">
+        <div id="monitorList"></div>
+      </div>
+    </section>
+
+    <!-- Teacher -->
+    <section id="teacher" class="page hidden">
+      <div class="panel">
+        <h2>لوحة المعلم</h2>
+        <div id="teacherInfo"></div>
+        <h3>طلبات طلاب الفصل</h3>
+        <div id="teacherList"></div>
+      </div>
+    </section>
+
+    <!-- Parent -->
+    <section id="parent" class="page hidden">
+      <div class="panel">
+        <h2>بوابة ولي الأمر</h2>
+        <p>اختر أحد أبنائك لإرسال طلب تجهيز.</p>
+        <select id="parentStudent"></select>
+        <select id="pickupLocation">
+          <option>بوابة المدرسة</option>
+          <option>عند السيارة</option>
+        </select>
+        <button class="primary full" onclick="sendRequest()">🔔 أنا في الخارج</button>
+        <div id="parentHistory"></div>
+      </div>
+    </section>
+
+    <!-- Board -->
+    <section id="board" class="page hidden">
+      <div class="panel board-panel">
+        <h2>الصبورة الإلكترونية</h2>
+        <select id="boardClass" onchange="renderBoard()"></select>
+        <p>عندما يظهر اسمك، اضغط زر أنا قادم.</p>
+        <div id="boardList"></div>
+      </div>
+    </section>
+
+    <footer>مدرسة المجد الجديد © 2026</footer>
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+<script src="script.js"></script>
+</body>
+</html>
